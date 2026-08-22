@@ -2,78 +2,164 @@
 
 ## Overview
 
-This document covers Azure storage configuration and storage-access troubleshooting.
+This section documents the planned Azure Storage configuration and support 
+scenarios for the Azure Cloud Support & Administration Lab.
+
+Azure Storage will be used to demonstrate cloud storage administration, 
+access management, permissions, file operations, and troubleshooting of 
+storage-access issues.
 
 ## Objectives
 
 - Create an Azure Storage Account
-- Review storage services
-- Work with containers or file storage
+- Review Azure storage services
+- Create a test storage resource
+- Upload non-sensitive test data
 - Configure access
-- Test file operations
-- Troubleshoot access-denied scenarios
+- Review storage permissions
+- Understand storage authentication
+- Troubleshoot access-denied errors
+- Validate restored access
 
-## Storage Account
+## Planned Storage Account
 
-- Name:
-- Resource Group: RG-IT-Support-Lab
-- Region:
-- Performance:
-- Redundancy:
+- **Name:** To be determined
+- **Resource Group:** RG-IT-Support-Lab
+- **Region:** To be determined
+- **Performance Tier:** To be determined
+- **Redundancy:** To be determined
+- **Purpose:** IT support lab storage testing
+
+The final storage account name will be recorded after Azure accepts an 
+available globally unique name.
 
 ## Storage Services
 
-Document services explored:
+The lab may explore:
 
 - Blob Storage
-- Azure Files
 - Containers
+- Azure Files
 - File shares
+
+The exact services used will depend on availability, cost, and lab 
+requirements.
 
 ## Test Data
 
-Create non-sensitive lab files for testing storage access.
+Only non-sensitive test files will be used.
 
-## Access Configuration
+Example files may include:
 
-Document:
+- IT support documentation
+- Sample logs
+- Test text files
+- Troubleshooting notes
 
+No passwords, credentials, personal information, or sensitive production data 
+will be stored.
+
+## Access Management
+
+Storage access will be reviewed through the appropriate Azure permissions and 
+authentication controls.
+
+The lab will evaluate:
+
+- Identity
+- Role assignment
+- Scope
+- Storage data permissions
+- Authentication
+- Authorization
+
+## Planned Storage Access Scenario
+
+### User Report
+
+A user reports that they cannot access a required Azure storage resource.
+
+### Investigation
+
+The planned investigation includes:
+
+1. Confirm the affected storage resource
+2. Confirm the user's identity
+3. Verify the storage account exists
+4. Review access configuration
+5. Review Azure role assignments
+6. Review role scope
+7. Review data-access permissions
+8. Test access
+9. Apply the least-privilege corrective action
+10. Retest access
+
+## Authentication vs Authorization
+
+The lab will distinguish between:
+
+**Authentication** — verifying who the user is.
+
+**Authorization** — determining what the authenticated user is permitted to 
+access.
+
+A successful Azure sign-in does not automatically provide access to every 
+storage resource.
+
+## Least Privilege
+
+Users should receive only the permissions necessary to perform their required 
+task.
+
+Broad roles will not be assigned simply to bypass a permissions problem.
+
+## Troubleshooting Methodology
+
+Storage troubleshooting will review:
+
+- Resource availability
+- Correct storage account
+- Correct target resource
+- Identity
+- Role assignment
+- Scope
+- Data permissions
 - Authentication method
-- Role assignments
-- Permissions
 - Access restrictions
+- Error messages
 
-## Support Scenario
-
-Simulate a user who cannot access required Azure storage.
-
-Document:
-
-1. User-reported problem
-2. Initial checks
-3. Permissions review
-4. Root cause
-5. Corrective action
-6. Verification
-
-## Validation
+## Validation Plan
 
 Verify:
 
 - Storage account exists
 - Test storage resource exists
-- Authorized access works
-- Unauthorized access is restricted
-- Permissions can be diagnosed and corrected
+- Test data can be stored
+- Authorized access succeeds
+- Unauthorized access remains restricted
+- Access failures can be reproduced
+- Permissions can be corrected
+- Access can be retested successfully
 
-## Screenshots
+## Screenshot Evidence
 
-Add storage screenshots after completing the configuration.
+Planned screenshots:
+
+- Storage account overview
+- Storage service
+- Test container or file share
+- IAM configuration
+- Access failure
+- Corrected permissions
+- Successful access after remediation
 
 ## Skills Demonstrated
 
 - Azure Storage
 - Storage accounts
-- Cloud permissions
+- Blob/File storage concepts
+- Azure permissions
+- RBAC
 - Access troubleshooting
-- Azure administration
+- Least privilege
+- Cloud administration
