@@ -1,496 +1,956 @@
-# Azure Identity and Role-Based Access Control
+# Microsoft Entra ID and Azure RBAC
 
 ## Overview
 
-This section documents the planned identity and access management 
-configuration for the Azure Cloud Support & Administration Lab.
+This section documents the identity, authorization, Azure Role-Based Access Control (RBAC), and least-privilege testing completed in the Azure Cloud Support & Administration Lab.
 
-Microsoft Entra ID and Azure Role-Based Access Control (RBAC) will be used to 
-demonstrate authentication, authorization, role assignments, permission 
-scope, least privilege, and troubleshooting of Azure resource access 
-problems.
+The identity portion of the lab focused on practical Azure support scenarios involving Microsoft Entra ID identities, Azure RBAC role assignments, role scope, management-plane permissions, data-plane permissions, resource visibility, storage access, and denied 
+administrative operations.
 
-The actual users, role assignments, scopes, and troubleshooting results will 
-be documented after the Azure environment is configured.
+Controlled access failures were intentionally reproduced so that permissions could be investigated and corrected without granting unnecessary administrative access.
+
+The completed scenarios demonstrate an important Azure support principle:
+
+Successful authentication does not automatically mean that a user is authorized to perform every operation on an Azure resource.
 
 ---
 
-## Objectives
+## Objectives Completed
 
-The objectives of this portion of the lab are to:
+The identity and RBAC portion of the lab demonstrated:
 
-- Review Microsoft Entra ID identities
-- Understand Azure Role-Based Access Control
-- Review Azure built-in roles
-- Assign permissions to Azure resources
-- Understand RBAC assignment scope
-- Apply the principle of least privilege
-- Troubleshoot missing resource access
-- Troubleshoot incorrect role assignments
-- Differentiate authentication from authorization
-- Verify access after permission changes
-- Document realistic Azure access support scenarios
+- Microsoft Entra ID identity testing
+- Azure RBAC administration
+- Existing role-assignment review
+- Storage Blob Data Reader assignment
+- Reader role assignment
+- Resource-group scoped RBAC
+- Storage-account scoped access
+- Role-scope analysis
+- Management-plane permissions
+- Data-plane permissions
+- Least-privilege access
+- Resource visibility troubleshooting
+- Blob access troubleshooting
+- Read-versus-write permission testing
+- Resource-group write-denial testing
+- Tag modification denial
+- Access verification
+- RBAC troubleshooting methodology
+- Technical documentation
+
+---
+
+## Identity and Authorization Model
+
+Azure access involves multiple layers.
+
+A technician troubleshooting an access problem should determine which layer is responsible before changing permissions.
+
+The major layers demonstrated in this lab included:
+
+1. Authentication
+2. Authorization
+3. Role assignment
+4. Role definition
+5. Role scope
+6. Management-plane access
+7. Data-plane access
+8. Network access
+9. Resource locks
+
+These controls perform different functions and should not be treated as interchangeable.
 
 ---
 
 ## Microsoft Entra ID
 
-Microsoft Entra ID provides identity and access management services used 
-throughout Microsoft Azure.
+Microsoft Entra ID provided the identity layer for Azure access testing.
 
-The lab will review how identities interact with Azure resources.
+A test identity was used to reproduce user-access scenarios without modifying the permissions of the primary administrative account.
 
-Identity concepts covered include:
+The test identity was used to evaluate:
 
-- Users
-- Groups
-- Authentication
-- Authorization
-- Role assignments
-- Administrative access
-- Resource access
+- Azure resource visibility
+- Blob Storage access
+- Reader permissions
+- Storage Blob Data Reader permissions
+- Resource-group access
+- Write restrictions
+- Tag modification restrictions
+- Least-privilege behavior
 
-Microsoft Entra ID establishes the identity of the user, while Azure RBAC 
-determines what that identity is authorized to do with Azure resources.
+Sensitive identity information should be obscured before screenshots are published to GitHub.
 
 ---
 
-## Authentication vs Authorization
+## Authentication
 
-Authentication and authorization represent two different parts of Azure 
-access management.
+Authentication verifies the identity attempting to access Azure.
 
-### Authentication
+In this lab, Microsoft Entra authentication was used when testing the permissions of the test identity.
 
-Authentication answers:
+Successful authentication confirmed who the user was.
 
-**Who is the user?**
+It did not determine whether the user could:
 
-A user successfully signing into Microsoft Azure demonstrates that their 
-identity has been authenticated.
+- View a resource
+- Read blob data
+- Upload blob data
+- Modify tags
+- Change Azure configuration
+- Delete resources
+- Modify resource locks
 
-### Authorization
+Those actions depend on authorization.
 
-Authorization answers:
+---
 
-**What is the user allowed to do?**
+## Authorization
 
-A successfully authenticated user may still be unable to access or modify an 
-Azure resource if the appropriate permissions have not been assigned.
+Authorization determines what an authenticated identity is allowed to do.
 
-This distinction is important when troubleshooting Azure access problems.
+Azure RBAC was used to control authorization.
 
-A successful Azure sign-in does not automatically provide access to every 
-Azure resource.
+Authorization decisions depend on factors including:
+
+- Assigned role
+- Role definition
+- Assignment scope
+- Resource type
+- Requested operation
+- Management-plane permissions
+- Data-plane permissions
+
+This distinction became central to several troubleshooting scenarios.
 
 ---
 
 ## Azure Role-Based Access Control
 
-Azure Role-Based Access Control determines what actions an identity can 
-perform against Azure resources.
+Azure RBAC provides access management for Azure resources.
 
-An Azure RBAC assignment consists of three primary components:
+An Azure role assignment connects three primary components:
 
-1. Security principal
-2. Role definition
-3. Scope
+- Security principal
+- Role definition
+- Scope
 
-Together, these determine who receives access, what actions they can perform, 
-and where those permissions apply.
+The security principal identifies who receives access.
+
+The role definition determines what operations are allowed.
+
+The scope determines where those permissions apply.
 
 ---
 
 ## Security Principal
 
-A security principal represents the identity receiving the Azure role 
-assignment.
-
-Examples include:
+The security principal can represent an Azure identity such as:
 
 - User
 - Group
 - Service principal
 - Managed identity
 
-For the support scenarios in this lab, user or group identities may be used 
-to demonstrate resource access.
-
-Actual identities used will be documented after the Azure environment is 
-configured.
+A test Microsoft Entra user was used for the hands-on RBAC scenarios in this lab.
 
 ---
 
 ## Role Definition
 
-A role definition contains a collection of permissions describing which Azure 
-operations can be performed.
+The role definition specifies the permissions granted by the assignment.
 
-The lab may evaluate built-in Azure roles including:
+Built-in Azure roles were used instead of creating unnecessarily broad custom permissions.
+
+Important roles demonstrated during the lab included:
 
 - Reader
-- Contributor
-- Virtual Machine Contributor
-- Storage-related roles
+- Storage Blob Data Reader
 
-Actual roles used will depend on the support scenarios performed.
+These roles were selected because they provided different types of access.
 
 ---
 
-## Reader Role
+## Scope
 
-The Reader role provides visibility into Azure resources without broad 
-modification permissions.
+Azure RBAC permissions can be assigned at different scopes.
 
-This role may be useful when a user needs to:
+Common Azure scopes include:
 
-- View resources
-- Review configuration
-- Review resource status
-- Inspect resource information
+- Management group
+- Subscription
+- Resource group
+- Individual resource
 
-A user assigned Reader access should not automatically receive permission to 
-modify the resource.
+Permissions assigned at a higher scope may be inherited by resources beneath that scope.
 
----
-
-## Contributor Role
-
-The Contributor role provides broader resource management capabilities.
-
-This role may allow a user to create or modify supported Azure resources 
-while not automatically granting unrestricted permission to manage access for 
-other users.
-
-Contributor access will only be used when required by the scenario.
+The lab demonstrated assignments at both resource and resource-group levels.
 
 ---
 
-## Virtual Machine Contributor
+## Existing Role Assignment Review
 
-The Virtual Machine Contributor role may be evaluated for VM-specific 
-administrative tasks.
+Existing Azure role assignments were reviewed before adding new access.
 
-This provides an opportunity to compare a specialized Azure role with broader 
-roles such as Contributor.
+This is an important troubleshooting step because adding another role without understanding existing permissions can:
 
-The goal is to determine whether a narrower role can satisfy the user's job 
-requirement.
+- Create excessive access
+- Make troubleshooting more difficult
+- Hide the original cause
+- Violate least-privilege principles
 
----
+Evidence:
 
-## Storage Roles
-
-Storage-specific Azure roles may be evaluated during the Azure Storage 
-portion of the lab.
-
-The storage scenario will demonstrate that access to a storage account 
-resource does not necessarily mean a user has permission to access the 
-underlying stored data.
-
-Actual storage roles used will be documented after configuration.
+`../Screenshots/Identity/01-RBAC-Existing-Role-Assignment.png`
 
 ---
 
-## RBAC Scope
+## Storage Blob Data Reader Assignment
 
-Azure role assignments can apply at different levels.
+The test identity was assigned:
 
-The planned hierarchy is:
+`Storage Blob Data Reader`
 
-Subscription
-    |
-    v
-Resource Group
-    |
-    v
-Individual Resource
+This role was selected to provide read access to Azure Blob Storage data without granting unnecessary write permissions.
+
+Evidence:
+
+`../Screenshots/Identity/02-RBAC-Blob-Data-Reader-Assignment.png`
+
+The role allowed the lab to test data-plane access separately from management-plane access.
+
+---
+
+## Management Plane and Data Plane
+
+One of the most important RBAC concepts demonstrated in the lab was the difference between Azure management-plane and data-plane permissions.
+
+### Management Plane
+
+Management-plane operations relate to the Azure resource itself.
+
+Examples include:
+
+- Viewing a storage account
+- Viewing resource properties
+- Viewing resource configuration
+- Reviewing Azure resource information
+
+### Data Plane
+
+Data-plane operations interact with the data stored inside the service.
+
+For Blob Storage, examples include:
+
+- Reading blobs
+- Uploading blobs
+- Modifying blobs
+- Deleting blobs
+
+A user can have data-plane permissions without having sufficient management-plane permissions to navigate or view the Azure resource through the Portal.
+
+---
+
+## Resource Visibility Troubleshooting Scenario
+
+A practical RBAC issue was reproduced using the test identity.
+
+The user had:
+
+`Storage Blob Data Reader`
+
+but the storage account was not properly visible through the expected Azure Portal workflow.
+
+This initially appeared to be a storage-access problem.
+
+Further investigation showed that the user had data-plane permissions but lacked sufficient management-plane visibility.
+
+---
+
+## Investigation
+
+The troubleshooting process reviewed:
+
+1. The affected identity
+2. The storage account
+3. Existing role assignments
+4. Role scope
+5. Storage Blob Data Reader permissions
+6. Azure resource visibility
+7. Management-plane requirements
+
+The investigation showed that Storage Blob Data Reader alone did not provide the management-plane visibility needed for the intended Portal workflow.
+
+Evidence:
+
+`../Screenshots/Troubleshooting/Identity-Access/07-RBAC-Storage-Account-Not-Visible.png`
+
+---
+
+## Reader Role Assignment
+
+The built-in Azure:
+
+`Reader`
+
+role was added to provide management-plane read visibility.
+
+Reader allows a user to view Azure resources without granting permission to modify them.
+
+This made it appropriate for the support scenario.
+
+Evidence:
+
+`../Screenshots/Troubleshooting/Identity-Access/06-RBAC-Reader-Assignment.png`
+
+---
+
+## Combined Least-Privilege Model
+
+The final access configuration used:
+
+- `Reader`
+- `Storage Blob Data Reader`
+
+The two roles provided separate capabilities.
+
+Reader provided management-plane resource visibility.
+
+Storage Blob Data Reader provided Blob Storage data read access.
+
+Evidence:
+
+`../Screenshots/Troubleshooting/Identity-Access/08-RBAC-Reader-And-Blob-Reader-Roles.png`
+
+This demonstrated that Azure support issues sometimes require understanding multiple permission layers rather than simply assigning a more powerful role.
+
+---
+
+## Access Verification
+
+After the role configuration was corrected, the test identity was used to verify the resulting permissions.
+
+The verification focused on two questions:
+
+1. Can the user perform the required operation?
+2. Are operations outside the user's responsibility still blocked?
+
+Both are necessary when validating least privilege.
+
+---
+
+## Successful Blob Read
+
+The test identity successfully accessed the required blob data.
+
+This confirmed that the Storage Blob Data Reader role provided the intended data-plane read access.
+
+Evidence:
+
+`../Screenshots/Troubleshooting/Identity-Access/10-RBAC-Blob-Read-Success.png`
+
+---
+
+## Write Operation Denied
+
+A write/upload operation was then attempted.
+
+Azure denied the operation.
+
+The authorization error indicated that the request was not authorized to perform the requested operation using the available permissions.
+
+Evidence:
+
+`../Screenshots/Troubleshooting/Identity-Access/09-RBAC-Read-Allowed-Write-Denied.png`
+
+This was an expected security result.
+
+The denied operation was not treated as an unresolved problem.
+
+It confirmed that the identity had read access without unnecessary write access.
+
+---
+
+## Least Privilege
+
+Least privilege means granting only the permissions required to perform an assigned task.
+
+The goal of troubleshooting is not to make every Azure operation succeed.
+
+The goal is to provide the required access while preserving appropriate restrictions.
+
+The final storage RBAC configuration demonstrated this principle:
+
+- Required resource visibility: Allowed
+- Required blob read access: Allowed
+- Unnecessary blob write access: Denied
+
+A broader role was not assigned merely to eliminate the authorization error.
+
+---
+
+## Resource Group RBAC Scenario
+
+RBAC testing was also performed at the resource-group level.
+
+The test identity was assigned the built-in:
+
+`Reader`
+
+role at:
+
+`RG-IT-Support-Lab`
+
+This provided an additional opportunity to validate read-only Azure administration.
+
+---
+
+## Resource Group Before Assignment
+
+The resource-group IAM configuration was reviewed before the Reader assignment.
+
+This established the starting state for the scenario.
+
+Evidence:
+
+`../Screenshots/Identity/03-Resource-Group-RBAC-Before-Assignment.png`
+
+---
+
+## Reader Role Assigned
+
+The Reader role was assigned to the test identity at the resource-group scope.
+
+Evidence:
+
+`../Screenshots/Identity/04-Resource-Group-Reader-Role-Assigned.png`
+
+Because the role was assigned at the resource-group level, the test identity received applicable read permissions for resources within that scope.
+
+---
+
+## Reader Access Verified
+
+The role assignment was verified after configuration.
+
+Evidence:
+
+`../Screenshots/Identity/05-Resource-Group-Reader-Access-Verified.png`
+
+This confirmed that the intended read-oriented access was available.
+
+---
+
+## Read-Only Access Testing
+
+Simply confirming that a role appears in IAM is not enough to fully validate access.
+
+The lab therefore tested operations that Reader should not be allowed to perform.
+
+This provided evidence that the permission boundary was working as intended.
+
+---
+
+## Resource Lock Modification Restriction
+
+The test identity attempted to interact with resource-lock administration.
+
+Azure indicated that the identity did not have permission to edit the locks.
+
+Evidence:
+
+`../Screenshots/Troubleshooting/Identity-Access/11-Resource-Group-Reader-Write-Denied.png`
+
+This was expected behavior for a Reader assignment.
+
+The result demonstrated that read visibility did not provide administrative modification rights.
+
+---
+
+## Tag Modification Denied
+
+Another write-oriented operation was tested by attempting to modify resource-group tags.
+
+Azure returned an authorization failure.
+
+Evidence:
+
+`../Screenshots/Troubleshooting/Identity-Access/12-Reader-Tag-Modification-Denied.png`
+
+This further validated the Reader permission boundary.
+
+The identity could view the resource group but could not make unauthorized configuration changes.
+
+---
+
+## Resource Group Governance Tags
+
+The administrative account configured governance tags on the resource group.
+
+The tags included:
+
+- `Environment = Lab`
+- `Department = IT`
+- `Purpose = Cloud-Support-Training`
+- `Owner = IT-Support`
+
+Evidence:
+
+`../Screenshots/Resource-Groups/03-Resource-Group-Governance-Tags.png`
+
+These tags demonstrated basic Azure resource organization and governance.
+
+The Reader identity could view applicable resource information but was not granted permission to modify the tags.
+
+---
+
+## Controlled Permission Testing
+
+The identity portion of the lab intentionally tested both successful and unsuccessful operations.
+
+Successful tests demonstrated required access.
+
+Denied tests demonstrated security boundaries.
+
+This distinction is important when documenting Azure support work.
+
+A denied operation can be successful verification when the assigned role is intentionally read-only.
+
+---
+
+## Storage Access Issue
+
+A separate storage-access scenario was used to investigate an authorization problem involving Azure Blob Storage.
+
+The investigation reviewed:
+
+- Identity
+- Role assignment
+- Role scope
+- Storage permissions
+- Authentication method
+- Required operation
+
+Evidence:
+
+`../Screenshots/Troubleshooting/Identity-Access/01-Storage-Access-Issue.png`
+
+---
+
+## RBAC Permission Investigation
+
+Azure IAM and role assignments were reviewed to determine whether the affected identity had the required permissions.
+
+Evidence:
+
+`../Screenshots/Troubleshooting/Identity-Access/02-RBAC-Permissions-Investigation.png`
+
+This demonstrated the importance of inspecting the actual role assignment rather than assuming a successful Azure sign-in means storage access should work.
+
+---
+
+## Microsoft Entra Blob Permission Denial
+
+The access problem was reproduced while using Microsoft Entra authentication.
+
+The identity encountered a permission-related failure.
+
+Evidence:
+
+`../Screenshots/Troubleshooting/Identity-Access/03-Entra-Blob-Access-Permission-Denied.png`
+
+This helped isolate the problem to authorization rather than basic authentication.
+
+---
+
+## Storage Blob Data Reader Remediation
+
+The appropriate least-privilege data role was assigned:
+
+`Storage Blob Data Reader`
+
+Evidence:
+
+`../Screenshots/Troubleshooting/Identity-Access/04-Storage-Blob-Data-Reader-Role-Assigned.png`
+
+The goal was to provide the required read access rather than broad storage administration.
+
+---
+
+## Storage Access Restored
+
+After the correct role assignment was applied and access was retested, the required Blob Storage access was restored.
+
+Evidence:
+
+`../Screenshots/Troubleshooting/Identity-Access/05-Storage-Blob-Access-Restored.png`
+
+This completed the original Blob Storage access-denied troubleshooting scenario.
+
+---
+
+## RBAC Troubleshooting Methodology
+
+A structured RBAC troubleshooting workflow was used throughout the lab.
+
+### 1. Identify the User
+
+Confirm the exact identity experiencing the problem.
+
+Do not troubleshoot permissions using assumptions about which account is signed in.
+
+### 2. Identify the Resource
+
+Confirm:
+
+- Subscription
+- Resource group
+- Resource
+- Container or data object where applicable
+
+### 3. Identify the Required Operation
+
+Determine exactly what the user needs to do.
+
+Examples include:
+
+- View resource
+- Read blob
+- Upload blob
+- Modify configuration
+- Edit tags
+- Delete resource
+
+The required operation determines the permissions that should be investigated.
+
+### 4. Review Existing Role Assignments
+
+Check Azure IAM before adding permissions.
+
+Review:
+
+- Role name
+- Assigned identity
+- Scope
+- Inheritance
+
+### 5. Determine the Permission Plane
+
+Determine whether the required operation is:
+
+- Management plane
+- Data plane
+
+This is especially important for Azure Storage.
+
+### 6. Review Scope
+
+Verify whether the role applies at the correct scope.
 
 Possible scopes include:
 
 - Subscription
-- Resource Group
-- Individual Resource
-
-A role assigned at a broader scope may be inherited by resources beneath that 
-scope.
-
-For example, a role assigned to RG-IT-Support-Lab may apply to supported 
-resources contained within that resource group.
-
----
-
-## Planned Resource Group Scope
-
-The primary resource group for this lab is:
-
-**RG-IT-Support-Lab**
-
-Some permission scenarios may use the resource group as the assignment scope.
-
-Other scenarios may intentionally use an individual resource scope to 
-demonstrate more restrictive access.
-
----
-
-## Principle of Least Privilege
-
-Role assignments will follow the principle of least privilege.
-
-Users should receive only the permissions required to perform their assigned 
-responsibilities.
-
-The lab will follow these guidelines:
-
-- Do not assign Owner simply to resolve a basic access problem
-- Select the narrowest appropriate Azure role
-- Select the narrowest appropriate scope
-- Avoid unnecessary administrative permissions
-- Review inherited permissions
-- Verify access after changes
-- Remove unnecessary permissions when appropriate
-
-This approach reduces security risk while still allowing users to perform 
-required tasks.
-
----
-
-## Planned Access Scenario
-
-### User Report
-
-A user successfully signs into Azure but cannot access a required Azure 
-resource.
-
-### Initial Assessment
-
-Because authentication succeeds, the investigation will focus primarily on 
-authorization and Azure resource permissions.
-
-### Planned Investigation
-
-1. Confirm the user's identity
-2. Confirm the correct Azure tenant and subscription
-3. Identify the affected resource
-4. Open Access Control (IAM)
-5. Review existing role assignments
-6. Review inherited role assignments
-7. Determine the user's current role
-8. Review the role assignment scope
-9. Determine the permissions required for the user's task
-10. Select an appropriate least-privilege role
-11. Apply the role assignment if required
-12. Allow time for permission propagation if necessary
-13. Retest access
-14. Verify that unnecessary permissions were not granted
-
----
-
-## Planned Incorrect RBAC Assignment Scenario
-
-A second support scenario will involve a user who can view an Azure resource 
-but cannot perform the administrative action required by their job.
-
-This scenario will demonstrate that having some access to a resource does not 
-necessarily provide permission to perform every operation.
-
-### Planned Investigation
-
-The investigation will compare:
-
-- User identity
-- Existing role
-- Required operation
-- Permissions included in the existing role
-- Assignment scope
-- Inherited permissions
-- Appropriate replacement or additional role
-- Least-privilege requirements
-
-For example, a user with Reader access may be able to view a resource while 
-being unable to modify it.
-
-The actual role configuration and resolution will be documented after 
-reproducing the scenario in Azure.
-
----
-
-## Missing Resource Access Troubleshooting
-
-When a user reports that an Azure resource is missing or inaccessible, the 
-investigation will review:
-
-- Correct user identity
-- Correct Microsoft Entra tenant
-- Correct Azure subscription
-- Resource existence
 - Resource group
-- Access Control (IAM)
-- Existing role assignments
-- Inherited assignments
-- Role definition
+- Resource
+
+### 7. Reproduce the Error
+
+Where safe, reproduce the access problem.
+
+Record the Azure error behavior.
+
+### 8. Apply Least Privilege
+
+Select the smallest appropriate role that satisfies the support requirement.
+
+Avoid granting Contributor, Owner, or other broad roles when a narrower role is sufficient.
+
+### 9. Retest Required Access
+
+Confirm the required operation now works.
+
+### 10. Test the Security Boundary
+
+Where appropriate, verify that unauthorized operations remain blocked.
+
+This provides stronger evidence of correct RBAC configuration.
+
+---
+
+## Common RBAC Troubleshooting Questions
+
+When investigating an Azure permissions issue, useful questions include:
+
+- Which identity is affected?
+- Is the identity authenticated successfully?
+- Which Azure resource is affected?
+- What exact operation is failing?
+- Which roles are already assigned?
+- At what scope are they assigned?
+- Is the required permission management plane or data plane?
+- Is the assignment inherited?
+- Is there an explicit network restriction?
+- Is a resource lock affecting the operation?
+- Is the user attempting a write operation with a read-only role?
+- Has the role assignment had time to propagate?
+
+These questions help narrow the problem before permissions are changed.
+
+---
+
+## RBAC vs Network Access
+
+RBAC and networking solve different security problems.
+
+RBAC determines whether an identity is authorized to perform an operation.
+
+Network controls determine whether the request can reach the service through the permitted network path.
+
+A user can therefore have correct RBAC permissions and still encounter a network-access failure.
+
+Likewise, an open network path does not grant authorization.
+
+The lab demonstrated both RBAC and storage-networking failures so that these causes could be investigated independently.
+
+---
+
+## RBAC vs Resource Locks
+
+RBAC and resource locks also perform different functions.
+
+RBAC determines what an identity is authorized to do.
+
+Resource locks protect Azure resources from specific administrative changes such as deletion.
+
+A user with significant Azure permissions may still encounter an operation blocked by a resource lock.
+
+The storage portion of the lab demonstrated this behavior through a Delete lock.
+
+---
+
+## RBAC vs Azure Policy
+
+Azure Policy and RBAC serve different purposes.
+
+RBAC controls who can perform actions.
+
+Azure Policy evaluates or enforces resource configuration requirements.
+
+The lab separately configured Azure Policy to demonstrate governance.
+
+Permissions problems should not automatically be treated as policy problems, and policy compliance problems should not automatically be treated as RBAC problems.
+
+---
+
+## Role Assignment Security Principles
+
+The following principles were applied during the lab:
+
+- Review existing access before adding roles
+- Use built-in roles when appropriate
+- Prefer narrow roles over broad administrative access
+- Assign permissions at the smallest reasonable scope
+- Separate management-plane and data-plane requirements
+- Verify required operations
+- Verify unauthorized operations remain blocked
+- Remove temporary access when no longer required
+- Document role changes
+- Protect identity information in screenshots
+
+---
+
+## Roles Not Used as Shortcuts
+
+Broad Azure roles should not be assigned simply to resolve an access error quickly.
+
+Examples of powerful roles include:
+
+- Owner
+- Contributor
+- User Access Administrator
+
+These roles can provide substantially more access than a read-only support requirement needs.
+
+The completed lab demonstrated that combining:
+
+`Reader`
+
+with:
+
+`Storage Blob Data Reader`
+
+could satisfy the tested visibility and blob-read requirements without granting unnecessary write access.
+
+---
+
+## Role Propagation
+
+Azure role assignments may require time to propagate.
+
+When validating a new role assignment, a technician should account for possible propagation delay before concluding that the assignment failed.
+
+Repeatedly adding broader roles during a propagation delay can create excessive access.
+
+The safer approach is to:
+
+1. Verify the assignment
+2. Verify the scope
+3. Allow reasonable propagation time
+4. Refresh or reauthenticate where appropriate
+5. Retest
+
+---
+
+## Evidence Collection
+
+RBAC troubleshooting evidence should capture enough information to demonstrate:
+
+- The affected resource
+- Relevant role assignment
 - Assignment scope
-- Permission propagation
-- Authentication status
+- Access failure
+- Corrective action
+- Successful required access
+- Expected denied access where applicable
 
-The investigation should identify the cause before permissions are changed.
-
----
-
-## Incorrect Role Troubleshooting
-
-When a user can access a resource but cannot perform a required operation, 
-the investigation will review:
-
-1. What action the user is attempting
-2. What role the user currently has
-3. What permissions that role provides
-4. Where the role is assigned
-5. Whether the role is inherited
-6. What minimum permissions are required
-7. Whether a more appropriate built-in role exists
-
-The goal is to correct the permission problem without unnecessarily 
-increasing the user's privileges.
+Sensitive identifiers should be obscured before public publication.
 
 ---
 
-## Permission Scope Troubleshooting
+## Screenshot Privacy
 
-A technically correct role may still fail to provide access if it is assigned 
-at the wrong scope.
+Azure identity screenshots can expose sensitive information.
 
-The lab will examine situations where:
+Before publishing screenshots to GitHub, review them for:
 
-- A role exists but applies to the wrong resource
-- A role applies only to an individual resource
-- A role is inherited from a resource group
-- A broader assignment provides unintended access
-- A narrower assignment better satisfies least privilege
+- Email addresses
+- User principal names
+- Subscription IDs
+- Tenant IDs
+- Object IDs
+- Principal IDs
+- Account identifiers
+- IP addresses
+- Correlation IDs
+- Request IDs
 
-Scope will therefore be reviewed as part of every RBAC troubleshooting 
-scenario.
-
----
-
-## Permission Propagation
-
-Azure permission changes may not always appear immediately.
-
-When testing a new role assignment, the troubleshooting process may include:
-
-- Refreshing the Azure portal
-- Signing out and back in when appropriate
-- Waiting for permission changes to propagate
-- Confirming the correct identity is being tested
-- Reviewing the role assignment again
-
-A temporary delay should not automatically be treated as a failed role 
-assignment.
+Credentials, access tokens, passwords, access keys, and other secrets must never be published.
 
 ---
 
-## Planned Validation
+## Identity Screenshot Evidence
 
-After performing the identity and RBAC portion of the lab, verify that:
+Core RBAC screenshots include:
 
-- Microsoft Entra identities can be reviewed
-- Azure Access Control (IAM) can be accessed
-- Existing role assignments can be identified
-- Built-in roles can be reviewed
-- Role scope can be identified
-- Resource-level and resource-group-level permissions can be distinguished
-- Missing access can be reproduced
-- Incorrect permissions can be diagnosed
-- Least-privilege access can be assigned
-- Access can be retested after remediation
-- Excessive permissions are not granted
+- `../Screenshots/Identity/01-RBAC-Existing-Role-Assignment.png`
+- `../Screenshots/Identity/02-RBAC-Blob-Data-Reader-Assignment.png`
+- `../Screenshots/Identity/03-Resource-Group-RBAC-Before-Assignment.png`
+- `../Screenshots/Identity/04-Resource-Group-Reader-Role-Assigned.png`
+- `../Screenshots/Identity/05-Resource-Group-Reader-Access-Verified.png`
 
 ---
 
-## Planned Screenshot Evidence
+## Identity and Access Troubleshooting Evidence
 
-Potential screenshots include:
+Additional troubleshooting screenshots include:
 
-- Azure Access Control (IAM)
-- Role assignments
-- Built-in Azure roles
-- Reader role assignment
-- Resource group scope
-- Individual resource scope
-- Missing resource access scenario
-- Incorrect RBAC assignment
-- Corrected role assignment
-- Successful access after remediation
-
-Screenshots will only be added after the scenarios are actually performed.
-
-Sensitive account information will be excluded or obscured when necessary.
+- `../Screenshots/Troubleshooting/Identity-Access/01-Storage-Access-Issue.png`
+- `../Screenshots/Troubleshooting/Identity-Access/02-RBAC-Permissions-Investigation.png`
+- `../Screenshots/Troubleshooting/Identity-Access/03-Entra-Blob-Access-Permission-Denied.png`
+- `../Screenshots/Troubleshooting/Identity-Access/04-Storage-Blob-Data-Reader-Role-Assigned.png`
+- `../Screenshots/Troubleshooting/Identity-Access/05-Storage-Blob-Access-Restored.png`
+- `../Screenshots/Troubleshooting/Identity-Access/06-RBAC-Reader-Assignment.png`
+- `../Screenshots/Troubleshooting/Identity-Access/07-RBAC-Storage-Account-Not-Visible.png`
+- `../Screenshots/Troubleshooting/Identity-Access/08-RBAC-Reader-And-Blob-Reader-Roles.png`
+- `../Screenshots/Troubleshooting/Identity-Access/09-RBAC-Read-Allowed-Write-Denied.png`
+- `../Screenshots/Troubleshooting/Identity-Access/10-RBAC-Blob-Read-Success.png`
+- `../Screenshots/Troubleshooting/Identity-Access/11-Resource-Group-Reader-Write-Denied.png`
+- `../Screenshots/Troubleshooting/Identity-Access/12-Reader-Tag-Modification-Denied.png`
 
 ---
 
-## Related Help Desk Tickets
+## Related Help-Desk Tickets
 
-This documentation will support:
+The identity and RBAC work is supported by several completed help-desk tickets.
 
-### Ticket 004 — Missing Resource Access
+### Ticket 001
 
-A user authenticates successfully but cannot access the required Azure 
-resource.
+`../Help-Desk-Tickets/Ticket-001-Blob-Storage-Access-Denied.md`
 
-Primary concepts:
+Documents a Blob Storage access-denied scenario and RBAC remediation.
 
-- Authentication
-- Authorization
-- IAM
-- RBAC
-- Role assignment
-- Scope
+### Ticket 004
 
-### Ticket 005 — Incorrect RBAC Assignment
+`../Help-Desk-Tickets/Ticket-004-RBAC-Resource-Visibility-Issue.md`
 
-A user can access an Azure resource but cannot perform the required 
-administrative operation.
+Documents the difference between Blob Storage data access and Azure resource visibility.
 
-Primary concepts:
+### Ticket 008
 
-- Existing role
-- Required permissions
-- Role definition
-- Scope
-- Least privilege
+`../Help-Desk-Tickets/Ticket-008-Resource-Group-Reader-Write-Denied.md`
 
-### Ticket 006 — Storage Access Denied
-
-Azure identity and RBAC concepts may also contribute to troubleshooting 
-storage-access permissions.
+Documents expected write denial while using the Reader role at resource-group scope.
 
 ---
 
-## Security Considerations
+## Support Scenario Summary
 
-Identity and permission configuration will follow these principles:
+The completed RBAC scenarios demonstrated several distinct access problems.
 
-- Least privilege
-- Avoid unnecessary Owner assignments
-- Avoid unnecessarily broad scope
-- Verify the correct identity before changing permissions
-- Review inherited access
-- Protect account information in screenshots
-- Do not document passwords or credentials
-- Validate access after changes
+### Scenario 1 — Blob Access Denied
+
+**Problem:** Authenticated user lacked required Blob Storage data permissions.
+
+**Investigation:** Azure IAM and data access were reviewed.
+
+**Resolution:** Storage Blob Data Reader was assigned.
+
+**Verification:** Required blob access was restored.
 
 ---
 
-## Expected Outcome
+### Scenario 2 — Storage Account Not Visible
 
-After the Azure environment is built, this portion of the lab should 
-demonstrate the ability to investigate and resolve realistic Azure 
-authorization problems using Microsoft Entra ID, Azure IAM, RBAC roles, and 
-assignment scope.
+**Problem:** User had Blob data permissions but insufficient management-plane visibility.
 
-Actual results, role assignments, troubleshooting findings, and verification 
-evidence will be added after the scenarios are completed.
+**Investigation:** Existing roles and permission planes were reviewed.
+
+**Resolution:** Reader was added.
+
+**Verification:** Resource visibility and blob read access were available.
+
+---
+
+### Scenario 3 — Blob Write Denied
+
+**Problem:** Test identity could read but could not upload/write.
+
+**Investigation:** Assigned roles were reviewed.
+
+**Finding:** The identity intentionally had read-only permissions.
+
+**Resolution:** No additional permissions were required.
+
+**Verification:** Read succeeded and write remained denied.
+
+This was correct least-privilege behavior.
+
+---
+
+### Scenario 4 — Resource Group Write Denied
+
+**Problem:** Reader identity could view the resource group but could not perform administrative changes.
+
+**Investigation:** Reader permissions were reviewed.
+
+**Finding:** Reader is intentionally read-only.
+
+**Resolution:** No additional role was assigned.
+
+**Verification:** Read access remained available while write operations remained denied.
+
+This was also correct least-privilege behavior.
 
 ---
 
@@ -498,17 +958,43 @@ evidence will be added after the scenarios are completed.
 
 - Microsoft Azure
 - Microsoft Entra ID
-- Azure Role-Based Access Control
-- Identity and Access Management
-- Authentication
-- Authorization
-- Azure Access Control (IAM)
-- Built-in Azure roles
+- Azure RBAC
+- Identity and access management
 - Role assignments
-- Permission scope
+- Role scope
+- Reader role
+- Storage Blob Data Reader
+- Management-plane permissions
+- Data-plane permissions
+- Azure Storage authorization
 - Least privilege
-- Permissions troubleshooting
-- Technical support
-- Root cause analysis
+- Resource-group access control
+- Access-denied troubleshooting
+- Resource visibility troubleshooting
+- Permission verification
+- Root-cause analysis
+- Cloud security
 - Technical documentation
+- Help-desk troubleshooting
 
+---
+
+## Outcome
+
+The identity and RBAC portion of the Azure Cloud Support & Administration Lab demonstrated practical Azure access-management troubleshooting rather than simply assigning broad administrative permissions.
+
+The lab reproduced multiple access conditions, investigated Azure role assignments and scopes, distinguished management-plane access from data-plane access, corrected missing permissions using built-in roles, and verified least-privilege boundaries through both 
+successful and denied operations.
+
+The completed scenarios demonstrated that:
+
+- Authentication and authorization are separate
+- Management-plane and data-plane permissions are separate
+- Role scope matters
+- Resource visibility does not automatically provide data access
+- Data access does not automatically provide resource-management visibility
+- Reader access does not provide write access
+- Denied operations can be evidence of correctly configured least privilege
+- Troubleshooting should identify the required operation before permissions are changed
+
+The resulting configuration provides portfolio evidence of Microsoft Entra ID, Azure RBAC, least-privilege access control, and cloud-support troubleshooting.

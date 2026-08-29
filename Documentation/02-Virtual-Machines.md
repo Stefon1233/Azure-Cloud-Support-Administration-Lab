@@ -1,100 +1,229 @@
-# Azure Virtual Machines
+# Azure Virtual Machines - Deployment Feasibility and Support Planning
 
 ## Overview
 
-This section documents the planned deployment, administration, and 
-troubleshooting of a Windows virtual machine within the Azure Cloud Support & 
-Administration Lab.
+This section documents the evaluation of Azure Virtual Machine deployment options within the Azure Cloud Support & Administration Lab.
 
-The virtual machine will provide a realistic cloud-hosted Windows system for 
-practicing remote administration, networking, monitoring, access control, and 
-help-desk troubleshooting.
+A Windows virtual machine was originally planned as part of the environment to provide hands-on experience with Windows administration, Remote Desktop Protocol (RDP), VM lifecycle management, networking, monitoring, and troubleshooting.
 
-## Objectives
+During deployment planning, suitable low-cost B-series virtual machine sizes were unavailable for the lab subscription in the tested Azure regions.
 
-The objectives of this portion of the lab are to:
+Rather than deploying a larger and more expensive virtual machine solely to satisfy the original lab design, the deployment was intentionally deferred.
 
-- Deploy a Windows virtual machine in Microsoft Azure
-- Configure VM networking
-- Review VM sizing and resource configuration
-- Understand public and private IP addressing
-- Configure remote administrative access
-- Connect to the VM using Remote Desktop Protocol
-- Perform VM lifecycle operations
-- Review VM resource information
-- Troubleshoot VM connectivity and availability issues
-- Document support scenarios involving Azure virtual machines
+The investigation itself demonstrates an important cloud-support skill: evaluating Azure resource availability, subscription constraints, regional availability, and cost before deploying infrastructure.
 
-## Planned Virtual Machine
+---
 
-- **VM Name:** VM-ITSupport-01
-- **Resource Group:** RG-IT-Support-Lab
+## Original Deployment Objective
+
+The planned virtual machine was:
+
+- **VM Name:** `VM-ITSupport-01`
+- **Resource Group:** `RG-IT-Support-Lab`
 - **Operating System:** Windows
-- **Region:** To be determined during deployment
-- **VM Size:** To be selected based on lab requirements and cost
-- **Virtual Network:** VNET-IT-Support
-- **Subnet:** SNET-Workstations
-- **Network Security Group:** NSG-IT-Support
-- **Private IP:** To be assigned during deployment
-- **Public IP:** To be determined during deployment
+- **Virtual Network:** `VNET-IT-Support`
+- **Subnet:** `SNET-Workstations`
+- **Network Security Group:** `NSG-IT-Support`
 
-## Virtual Machine Deployment
+The VM was intended to support:
 
-The VM will be deployed through the Microsoft Azure portal.
+- Windows administration
+- Azure VM configuration
+- Azure networking
+- RDP troubleshooting
+- VM lifecycle management
+- Azure Monitor
+- Activity Log investigations
+- Help-desk troubleshooting scenarios
 
-Deployment configuration will include:
+---
 
-1. Selecting the correct Azure subscription
-2. Selecting RG-IT-Support-Lab
-3. Creating VM-ITSupport-01
-4. Selecting an appropriate Windows image
-5. Selecting a cost-conscious VM size
-6. Configuring administrator authentication
-7. Connecting the VM to VNET-IT-Support
-8. Connecting the VM to SNET-Workstations
-9. Configuring network access
-10. Reviewing the deployment before creation
+## Deployment Evaluation
 
-Actual deployment settings will be recorded after the VM has been created.
+Before deploying the virtual machine, I reviewed available Azure VM sizes with the goal of selecting a low-cost SKU appropriate for a temporary training environment.
 
-## VM Networking
+The preferred approach was to use a small B-series virtual machine because the lab did not require production-level compute capacity.
 
-The virtual machine will use an Azure network interface connected to the lab 
-virtual network.
+Small B-series options were investigated in multiple Azure regions.
 
-The networking configuration will be reviewed for:
+The tested regions included:
 
-- Network interface
+- North Central US
+- East US
+
+Suitable small B-series VM sizes were not available for the subscription during the deployment attempt.
+
+A larger VM size such as a D-series option was available, but deploying a higher-cost VM was not justified for the objectives of this lab.
+
+---
+
+## Deployment Decision
+
+The virtual machine deployment was intentionally deferred.
+
+This decision was based on:
+
+1. Subscription and SKU availability
+2. Regional VM availability
+3. Cost control
+4. Actual lab requirements
+5. Availability of other Azure services for demonstrating cloud-support skills
+
+Deploying a larger VM would have added unnecessary cost without materially improving the portfolio.
+
+This reflects a practical cloud-administration principle:
+
+> Resources should be deployed based on technical requirements, availability, and cost rather than simply because they were included in an initial design.
+
+---
+
+## Troubleshooting Approach
+
+When the preferred VM sizes were unavailable, the deployment issue was evaluated as a resource-availability and subscription constraint rather than a general Azure failure.
+
+The investigation considered:
+
+- Azure region
+- Available VM SKUs
+- Subscription limitations
+- VM sizing
+- Cost
+- Alternative regions
+- Whether the workload required a larger VM
+
+Testing another region did not provide a suitable low-cost deployment option.
+
+The available larger VM option was therefore not deployed.
+
+---
+
+## Cost Management Consideration
+
+Cost management was an important part of the decision.
+
+Cloud administrators should avoid provisioning oversized resources when a workload does not require them.
+
+For a temporary IT support training environment, deploying a larger VM would introduce unnecessary compute charges.
+
+Instead, the lab prioritized Azure services that could demonstrate relevant cloud-support capabilities without unnecessary infrastructure cost.
+
+These included:
+
+- Azure Storage
+- Azure RBAC
+- Microsoft Entra ID
+- Azure Monitor
+- Azure Activity Log
+- Log Analytics
+- Azure Monitor Workbooks
+- Azure Policy
+- Azure Advisor
+- Azure Service Health
+- Resource Health
+- Cost Management
+
+---
+
+## Azure Networking Preparation
+
+Although the Windows VM was not deployed, Azure networking was still configured and tested independently.
+
+The networking environment included:
+
 - Virtual Network
 - Subnet
-- Private IP address
-- Public IP configuration
 - Network Security Group
 - Inbound security rules
-- Outbound connectivity
 
-## Remote Administration
+The lab also included a simulated RDP-related NSG troubleshooting scenario.
 
-Remote Desktop Protocol will be used as one method of administering the 
-Windows virtual machine.
+A deny rule for TCP port `3389` was intentionally configured to demonstrate how Network Security Group rules can prevent Remote Desktop connectivity.
 
-The planned troubleshooting process for RDP includes checking:
+The configuration was investigated and the blocking rule was removed after troubleshooting.
 
-1. VM power state
-2. VM IP configuration
-3. Network interface status
-4. Network Security Group rules
-5. TCP port 3389 access
-6. Source restrictions
-7. Windows Remote Desktop configuration
-8. Authentication
-9. Connectivity from the client system
+This allowed RDP-related network troubleshooting concepts to be demonstrated without claiming that an actual VM RDP session occurred.
 
-RDP access will only be enabled when required for the lab.
+---
 
-## VM Lifecycle Management
+## Planned VM Networking Model
 
-The lab will demonstrate common Azure VM administrative operations including:
+If `VM-ITSupport-01` were deployed, the intended network path would be:
+
+`VM-ITSupport-01`
+
+→ Azure Network Interface
+
+→ `SNET-Workstations`
+
+→ `VNET-IT-Support`
+
+→ `NSG-IT-Support`
+
+The NSG would control permitted inbound and outbound network traffic.
+
+Remote administration would require evaluation of TCP port `3389`, source restrictions, IP configuration, NSG rules, operating-system configuration, and authentication.
+
+---
+
+## RDP Troubleshooting Methodology
+
+For a future Azure Windows VM support incident, an RDP investigation would include:
+
+1. Verify VM power state
+2. Verify VM provisioning status
+3. Review network interface configuration
+4. Verify private and public IP configuration
+5. Review subnet configuration
+6. Review associated NSGs
+7. Review effective security rules
+8. Check TCP port `3389`
+9. Check rule priorities
+10. Verify source restrictions
+11. Review Windows RDP configuration
+12. Verify authentication
+13. Review Azure Activity Log for recent changes
+14. Review Azure Monitor and Resource Health
+
+This methodology was incorporated into the networking portion of the lab even though the VM itself was not provisioned.
+
+---
+
+## Network Security Group Troubleshooting Scenario
+
+A controlled NSG troubleshooting scenario was performed.
+
+An inbound rule named:
+
+`Deny-RDP-Test`
+
+was configured to deny TCP traffic on port:
+
+`3389`
+
+The rule used a priority that caused the deny rule to be evaluated before a potential lower-priority allow rule.
+
+The NSG configuration was reviewed to identify the blocking rule.
+
+After identifying the cause, the test rule was removed.
+
+This demonstrated:
+
+- NSG rule evaluation
+- Port-based troubleshooting
+- Rule priority analysis
+- RDP connectivity troubleshooting methodology
+- Controlled configuration changes
+- Verification after remediation
+
+Supporting screenshots are stored in:
+
+`../Screenshots/Troubleshooting/Networking/`
+
+---
+
+## VM Lifecycle Knowledge
+
+Although lifecycle operations were not performed on an actual VM in this lab, the planned support workflow included:
 
 - Start
 - Restart
@@ -106,104 +235,151 @@ The lab will demonstrate common Azure VM administrative operations including:
 - Review disks
 - Review monitoring information
 
-The difference between a running, stopped, and deallocated VM will be 
-documented after testing.
+An important Azure cost-management distinction is the difference between stopping an operating system and deallocating the Azure VM resource.
 
-## Planned Support Scenarios
+VM lifecycle management remains an important area for future expansion of the lab when an appropriate low-cost VM SKU is available.
 
-The virtual machine will support several help-desk scenarios.
-
-### RDP Connection Failure
-
-A user will report that they cannot establish an RDP session with the Azure 
-VM.
-
-The investigation will include:
-
-- VM state
-- IP addressing
-- NSG rules
-- Port configuration
-- RDP configuration
-- Authentication
-- Connectivity testing
-
-### VM Unavailable
-
-A user will report that the Azure-hosted system is unavailable.
-
-The investigation will include:
-
-- VM power state
-- Resource status
-- Azure Activity Log
-- Network configuration
-- Recent administrative changes
-
-### VM Performance Issue
-
-A user will report poor performance.
-
-The investigation will include:
-
-- CPU metrics
-- Disk activity
-- Network activity
-- VM configuration
-- Azure Monitor
-- Recent changes
-- Workload behavior
+---
 
 ## Security Considerations
 
-The VM configuration will follow basic security practices including:
+A future VM deployment would follow basic cloud security practices.
+
+These include:
 
 - Avoid unnecessary inbound ports
-- Restrict remote administrative access
-- Use appropriate authentication
+- Restrict administrative access
 - Apply least privilege
-- Avoid publishing credentials
-- Avoid exposing sensitive IP or account information in screenshots
-- Stop or deallocate resources when they are not required
+- Use appropriate authentication
+- Review NSG rules
+- Avoid exposing credentials
+- Avoid exposing sensitive IP information
+- Monitor administrative changes
+- Stop or deallocate unnecessary compute resources
+- Avoid oversized infrastructure
 
-## Validation Plan
+The networking portion of the current lab demonstrates several of these principles without requiring an active VM.
 
-After deployment, verify:
+---
 
-- VM exists in RG-IT-Support-Lab
-- VM reaches the expected power state
-- Network interface is attached
-- Private IP is assigned
-- VM is connected to the correct VNet and subnet
-- Required network rules are configured
-- Administrative connectivity works when intentionally permitted
-- VM can be restarted
-- VM can be stopped and started
-- Monitoring information is available
+## Support Decision
+
+The VM deployment limitation was not treated as a reason to abandon the Azure lab.
+
+Instead, the lab scope was adjusted.
+
+Hands-on work continued across:
+
+- Storage administration
+- Identity and access management
+- Azure RBAC
+- Resource-group RBAC
+- Azure networking
+- Network Security Groups
+- Resource locks
+- Blob recovery
+- Container recovery
+- Azure Monitor
+- Alert rules
+- Action Groups
+- Azure Policy
+- Azure Advisor
+- Resource Health
+- Service Health
+- Log Analytics
+- KQL
+- Azure Monitor Workbooks
+- Cost Management
+
+This allowed the environment to demonstrate cloud-support and administration skills while maintaining cost awareness.
+
+---
+
+## Future Expansion
+
+If a suitable low-cost VM SKU becomes available, the lab can be expanded with:
+
+- Windows Server or Windows client VM deployment
+- Network interface configuration
+- Private IP configuration
+- Controlled public IP configuration
+- RDP administration
+- VM start/restart/deallocate operations
+- VM metrics
+- Boot diagnostics
+- VM-specific Azure Monitor alerts
+- Windows Event Log collection
+- Log Analytics agent integration
+- VM performance troubleshooting
+- VM availability troubleshooting
+
+These would be treated as future enhancements rather than completed tasks.
+
+---
+
+## Validation
+
+The VM portion of the lab is considered complete as a deployment feasibility and support-planning exercise.
+
+Validated outcomes include:
+
+- Evaluated Azure VM deployment requirements
+- Reviewed available VM sizes
+- Considered multiple Azure regions
+- Identified low-cost SKU availability limitations
+- Evaluated a larger available VM option
+- Chose not to deploy unnecessarily expensive compute
+- Maintained cost-conscious cloud administration
+- Configured the supporting Azure network environment
+- Demonstrated NSG troubleshooting concepts
+- Documented future VM troubleshooting methodology
+- Continued the lab using other Azure services
+
+---
 
 ## Screenshot Evidence
 
-Planned screenshots:
+The strongest related evidence is contained in the networking and troubleshooting sections of the repository.
 
-- VM overview
-- VM deployment/configuration
-- VM networking
-- VM power state
-- Successful RDP session
-- VM monitoring information
-- VM troubleshooting scenario
+Relevant screenshots include:
 
-Screenshots will be added after the Azure environment is configured.
+- `../Screenshots/Networking/01-Virtual-Network-Overview.png`
+- `../Screenshots/Networking/02-NSG-Subnet-Association.png`
+- `../Screenshots/Networking/03-NSG-Default-Inbound-Rules.png`
+- `../Screenshots/Troubleshooting/Networking/01-NSG-Inbound-Rules-Before-Change.png`
+- `../Screenshots/Troubleshooting/Networking/02-NSG-Deny-RDP-Rule.png`
+- `../Screenshots/Troubleshooting/Networking/03-NSG-RDP-Blocking-Rule-Diagnosed.png`
+- `../Screenshots/Troubleshooting/Networking/04-NSG-Blocking-Rule-Removed.png`
+
+No screenshots are presented as evidence of an actual VM deployment or successful RDP session because those actions were not completed.
+
+---
 
 ## Skills Demonstrated
 
 - Microsoft Azure
-- Azure Virtual Machines
-- Windows administration
-- Remote Desktop Protocol
-- VM lifecycle management
+- Azure resource planning
+- VM sizing evaluation
+- Cloud cost awareness
+- Regional resource availability analysis
+- Subscription constraint troubleshooting
 - Azure networking
-- Cloud administration
-- Connectivity troubleshooting
-- Technical documentation
+- Network Security Groups
+- RDP troubleshooting methodology
+- Azure resource governance
+- Technical decision-making
+- Cloud support documentation
 
+---
+
+## Outcome
+
+The original plan called for deployment of a Windows Azure VM.
+
+Suitable low-cost VM SKUs were not available under the lab subscription in the tested regions. A larger VM option was available, but deploying it would have introduced unnecessary cost.
+
+The VM deployment was therefore intentionally deferred.
+
+Rather than presenting an incomplete deployment as completed work, this documentation records the actual technical investigation, deployment decision, networking preparation, troubleshooting methodology, and cost-management considerations.
+
+The lab remains suitable for demonstrating Azure cloud-support and administration skills while accurately representing the work performed.
