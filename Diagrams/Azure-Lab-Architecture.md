@@ -86,7 +86,9 @@ flowchart TB
     ACTIVITY --> LAW
     LAW --> KQL
     KQL --> WORKBOOK
-```---
+```
+
+---
 
 ## Architecture Components
 
